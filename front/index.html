@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>nimc</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#333" />
+  <script src="nimc-search.js"></script>
+  <script src="nimc-browse.js"></script>
+  <script src="nimc-dot.js"></script>
+  <script src="nimc-md.js"></script>
+  <script src="utils.js"></script>
+  <script src="ws.js"></script>
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+</head>
+
+<body>
+  <div class="main">
+    <div class="search">
+      <nimc-search></nimc-search>
+    </div>
+    <div class="browse">
+      <nimc-browse></nimc-browse>
+    </div>
+    <div class="line"></div>
+    <div class="hline">
+      <span></span>
+    </div>
+    <div class="view">
+
+    </div>
+  </div>
+  <script>
+    const view = document.querySelector('.view')
+    const browseElem = document.querySelector('nimc-browse')
+    const title = document.querySelector('title')
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').then(() => {
+        console.log('Service Worker Registered');
+      });
+    }
+    let path = ''
+    async function route(url) {
+      let split = url.split('#')
+      if (split.length == 2) {
+        path = split[1]
+        if (connection.readyState === 1) connection.send(path)
+        let type = path.split('.')[1]
+        if (type == 'png') {
+          view.innerHTML = ``
+          const img = document.createElement(`img`)
+          img.src = `${window.location.origin}${path}`
+          view.appendChild(img)
+        } else if (type == 'mp3') {
+          view.innerHTML = `
+            <audio controls="controls">
+              <source type="audio/mp3" src="${window.location.origin}${path}"></source>
+            </audio>`
+        } else {
+          let res = await fetch(`${window.location.origin}${path}`)
+          let data = await res.text()
+          render(data, type)
+        }
+        let dispPath = path;
+        if (path[0] == '/') dispPath = path.slice(1)
+        title.innerHTML = `nimc &nbsp;|&nbsp; ${dispPath}`
+        return path
+      } else {
+        window.location.hash = '#/'
+      }
+    }
+
+    function render(data, type) {
+      view.innerHTML = ``
+      const elem = document.createElement(`nimc-${type}`)
+      elem.data = data
+      view.appendChild(elem)
+    }
+
+    route(window.location.href)
+    function query(q) {
+      browseElem.query = q
+    }
+    async function init() {
+      let res = await fetch(`${window.location.origin}/q/`)
+      let data = await res.json()
+      console.log(data)
+      browseElem.data = data
+    }
+    init()
+    window.onhashchange = async ({ newURL }) => {
+      console.log(await route(newURL))
+    }
+  </script>
+</body>
+
+</html>
