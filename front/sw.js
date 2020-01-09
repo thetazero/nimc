@@ -5,7 +5,8 @@ const cacheName = 'nimc';
 //   '/style.css'
 // ];
 
-const filesToCache = ['']
+const filesToCache = [
+  '/lib/katex.min.js', '/lib/mhchem.min.js', '/lib/vis-network.min.js', 'lib/katex.min.css']
 
 self.addEventListener('install', e => {
   console.log('[ServiceWorker] Install');
