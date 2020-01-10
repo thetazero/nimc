@@ -4,6 +4,10 @@
       super()
       const shadow = this.attachShadow({ mode: 'open' });
       shadow.innerHTML = `<style>
+      :host{
+        font-weight:200;
+        line-height:125%;
+      }
       a:link,a:visited {
         color: hsl(200, 100%, 80%);
       }
