@@ -2,6 +2,18 @@ class nDot extends HTMLElement {
   constructor() {
     super()
     const shadow = this.attachShadow({ mode: 'open' });
+    shadow.innerHTML += `<div></div><style>
+    :host div{
+      width:100%;
+      height:100%;
+      background:#272727;
+    }
+    </style>`
+  }
+  connectedCallback() {
+    if (this.innerHTML) {
+      this.data = this.innerHTML
+    }
   }
   set data(value) {
     // console.log(value)
@@ -39,7 +51,15 @@ class nDot extends HTMLElement {
         }
       }
     }
-    let x = new vis.Network(this.shadowRoot, data, options)
+    if (this.getAttribute('height')) {
+      options.height = this.getAttribute('height')
+    }
+    if (this.getAttribute('width')) {
+      options.width = this.getAttribute('width')
+    }
+    let x = new vis.Network(this.shadowRoot.querySelector('div'), data, options)
+    // let x = new vis.Network(this.shadowRoot, data, options)
+
   }
 }
 customElements.define('nimc-dot', nDot)
