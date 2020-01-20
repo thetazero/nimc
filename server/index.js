@@ -39,17 +39,18 @@ app.get('*', async (req, res) => {
     let type = req.path.split('.')
     if (type.length) type = type[1]
     else type = null
-    // console.log(type)
+    let path = req.path.replace(/\%20/g, ' ')
     if (type == 'png' || type == 'mp3') {
       // console.log('type png')
       res.setHeader("Content-Type", mime.getType(req.url)); //Solution!
-      const data = await fs.readFile(`/Users/leshaseletskiy/Documents/nim${req.path}`)
-      res.send(process(data, type))
+      // const data = await fs.readFile(`/Users/leshaseletskiy/Documents/nim${path}`)
+      // res.send(process(data, type))
+      res.sendFile(`/Users/leshaseletskiy/Documents/nim${path}`)
     } else if (type == 'md') {
-      const data = await fs.readFile(`/Users/leshaseletskiy/Documents/nim${req.path}`, 'utf-8')
+      const data = await fs.readFile(`/Users/leshaseletskiy/Documents/nim${path}`, 'utf-8')
       res.send(process(data, type))
     } else {
-      const data = await fs.readFile(`/Users/leshaseletskiy/Documents/nim${req.path}`, 'utf-8')
+      const data = await fs.readFile(`/Users/leshaseletskiy/Documents/nim${path}`, 'utf-8')
       res.send(process(data, type))
     }
   } catch (err) {

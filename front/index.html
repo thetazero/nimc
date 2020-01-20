@@ -15,10 +15,13 @@
   <script src="nimc-md.js"></script>
   <script src="nimc-tex.js"></script>
   <script src="nimc-t0.js"></script>
+  <script src="nimc-plst.js"></script>
   <script src="utils.js"></script>
   <script src="ws.js"></script>
-  <script src="lib/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script> 
-  <script src="lib/mhchem.min.js" integrity="sha384-oa0lfxCGjaU1LdYckhq8LZcP+JTf8cyJXe69O6VE6UrShzWveT6KiCElJrck/stm" crossorigin="anonymous"></script>
+  <script src="lib/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz"
+    crossorigin="anonymous"></script>
+  <script src="lib/mhchem.min.js" integrity="sha384-oa0lfxCGjaU1LdYckhq8LZcP+JTf8cyJXe69O6VE6UrShzWveT6KiCElJrck/stm"
+    crossorigin="anonymous"></script>
   <script src="lib/vis-network.min.js"></script>
 </head>
 
@@ -60,7 +63,12 @@
           img.src = `${window.location.origin}${path}`
           view.appendChild(img)
         } else if (type == 'mp3') {
+          let name = path.split('/')
+          name = name.length ? name[name.length - 1] : name[0]
+          name = name.split('.')[0]
+          name = name.replace(/\%20/g, ' ')
           view.innerHTML = `
+            <h1>${name}</h1>
             <audio controls="controls">
               <source type="audio/mp3" src="${window.location.origin}${path}"></source>
             </audio>`
