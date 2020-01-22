@@ -3,7 +3,7 @@ customElements.define('nimc-plst', class extends HTMLElement {
     super()
     const shadow = this.attachShadow({ mode: 'open' });
     shadow.innerHTML = `<div class='container'>
-      <div class='title'></div>
+      <div class='main-title'></div>
       <div class='songs'></div>
       <input type='range' step='0.1'>
       <div class='controls'>
@@ -23,20 +23,25 @@ customElements.define('nimc-plst', class extends HTMLElement {
       }
       .container{
         min-height:200px;
-        max-width:80vw;
-        width:450px;
+        width:60vw;
+        min-width:450px;
         display:inline-block;
         word-wrap: break-word;
         background:#222;
         border-radius:7px;
       }
-      .title{
+      .main-title{
         border-bottom:3px solid #555;
         font-size:2em;
         padding:10px 20px;
       }
       .songs{
         padding:10px 0px;
+        max-height:60vh;
+        overflow-y:scroll;
+      }
+      .songs::-webkit-scrollbar {
+        display: none;
       }
       .a-song{
         font-size:1.1em;
@@ -44,6 +49,13 @@ customElements.define('nimc-plst', class extends HTMLElement {
         text-align:left;
         cursor:pointer;
         color:#ccc;
+      }
+      .a-song .title{
+        min-width:calc(450px - 130px);
+        -width:calc(60vw - 130px);
+        display:inline-block;
+        white-space:nowrap;
+        overflow:hidden;
       }
       .a-song .meta{
         font-size:0.91em;
@@ -138,11 +150,28 @@ customElements.define('nimc-plst', class extends HTMLElement {
       audio.pause()
 
     }
+    function processTime(time) {
+      let ret = ''
+      let hours = Math.floor(time / 3600)
+      if (hours) ret = `${hours}:`
+      let minutes = Math.floor((time - hours * 3600) / 60)
+      if (audio.duration >= 3600) ret += `${minutes.toString().padStart(2, '0')}:`
+      else if (audio.duration >= 60) ret += `${minutes}:`
+      let seconds = Math.floor(time - hours * 3600 - minutes * 60)
+      if (audio.duration >= 60) ret += `${seconds.toString().padStart(2, '0')}`
+      else ret += seconds.toString().padStart(2, '0')
+      return ret
+    }
+    let shadow = this.shadowRoot
+    function updateMeta(it) {
+      it = it ? it : shadow.querySelector('.meta')
+      it.innerHTML = `${processTime(audio.currentTime)} / ${processTime(audio.duration)}`
+    }
     let audio = this.shadowRoot.querySelector('audio')
     let playpause = this.shadowRoot.querySelector('.playpause')
     let progress = this.shadowRoot.querySelector('input[type="range"]')
     data = JSON.parse(data)
-    this.shadowRoot.querySelector('.title').innerText = data.title
+    this.shadowRoot.querySelector('.main-title').innerText = data.title
     console.log(data)
     let songs = this.shadowRoot.querySelector('.songs')
 
@@ -153,7 +182,7 @@ customElements.define('nimc-plst', class extends HTMLElement {
     data.songs.forEach((e, i) => {
       let it = document.createElement('div')
       it.classList = 'a-song'
-      it.innerText = e.name
+      it.innerHTML = `<span class='title'>${e.name}</span>`
       it.addEventListener('click', () => {
         if (last != i) {
           setup(i)
@@ -178,25 +207,20 @@ customElements.define('nimc-plst', class extends HTMLElement {
       play()
     }
     audio.addEventListener('timeupdate', e => {
-      if (this.shadowRoot.activeElement != progress) {
-        let value = Math.round(audio.currentTime / audio.duration * 100)
-        if (isNaN(value)) progress.value = 0
-        else progress.value = value
+      let value = Math.round(audio.currentTime / audio.duration * 100)
+      if (isNaN(value)) progress.value = 0
+      else {
+        updateMeta()
+        progress.value = value
       }
+
     })
     audio.onloadeddata = () => {
       console.log('audio loaded')
       let it = document.createElement('span')
       it.classList = 'meta'
-      let hours = Math.floor(audio.duration / 3600)
-      if (hours) it.innerText = `${hours}:`
-      let minutes = Math.floor((audio.duration - hours * 3600) / 60)
-      if (hours) it.innerText += minutes.toString().padStart(2, '0')
-      else if (minutes) it.innerText += `${minutes}:`
-      let seconds = Math.floor(audio.duration - hours * 3600 - minutes * 60)
-      if (minutes) it.innerText += seconds.toString().padStart(2, '0')
-      else it.innerText += seconds
       elems[last].appendChild(it)
+      updateMeta(it)
     }
     this.shadowRoot.querySelector('.left').addEventListener('click', () => {
       setup(last - 1)
@@ -210,6 +234,7 @@ customElements.define('nimc-plst', class extends HTMLElement {
     })
     progress.addEventListener('change', () => {
       audio.currentTime = progress.value / 100 * audio.duration
+      updateMeta()
     })
   }
 })

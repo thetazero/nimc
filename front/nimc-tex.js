@@ -9,7 +9,7 @@ customElements.define('nimc-tex', class extends HTMLElement {
   }
   connectedCallback() {
     if (this.innerHTML) {
-      this.data = this.innerHTML.replace(/&gt;/g, '>').replace(/&lt;/g, '<')
+      this.data = this.innerHTML.replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/amp;/g, '&')
     }
   }
   set data(data) {

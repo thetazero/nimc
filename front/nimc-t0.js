@@ -30,8 +30,8 @@
         display:inline-block;
         margin:0px;
       }
-      nimc-tex{
-        font-size:0.826446281em;
+      nimc-tex.inline{
+        // font-size:0.826446281em;
       }
       </style>
       <div></div>`
@@ -179,7 +179,6 @@
       } else if (value[i] == '$') {
         if (value[i + 1] == '$') {
           for (let j = i + 2; j < value.length; j++) {
-            if (['\n'].includes(value[j])) break
             if (value.slice(j, j + 2) == '$$') {
               if (stackstart != i) tokens.push(new Token('text', value.slice(stackstart, i)))
               tokens.push(new Token('katex-block', value.slice(i + 2, j)))
@@ -317,7 +316,7 @@
       else if (this.type == 'list') return `<li>`
       else if (this.type == 'code-block') return `<p><pre>${this.value}`
       else if (this.type == 'dot') return `<p class='dot-container'><nimc-dot height=400px width=400px>bigraph{${this.value}}`
-      else if (this.type == 'katex') return `<nimc-tex>${this.value}`
+      else if (this.type == 'katex') return `<nimc-tex class='inline'>${this.value}`
       else if (this.type == 'katex-block') return `<p><nimc-tex>${this.value}`
       else if (this.type == 'linebreak') return `<br/>`
       else if (this.type == 'tabspace') return '&nbsp;&nbsp;&nbsp;&nbsp;'.repeat(this.value)
