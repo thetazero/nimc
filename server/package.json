@@ -11,7 +11,7 @@
   "dependencies": {
     "directory-tree": "^2.2.4",
     "express": "^4.17.1",
-    "markdown-it": "^10.0.0",
+    "markdown-it": "^12.3.2",
     "markdown-it-wiki-toc": "^1.0.4",
     "mime": "^2.4.4",
     "ws": "^7.2.1"
